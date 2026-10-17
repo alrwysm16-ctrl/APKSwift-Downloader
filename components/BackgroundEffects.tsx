@@ -4,19 +4,19 @@ import React from 'react';
 
 export default function BackgroundEffects() {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none">
-      {/* Top right cyan ambient glow */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px]" />
+    <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none w-full max-w-[100vw]">
+      {/* Top right cyan ambient glow - scaled safely */}
+      <div className="absolute -top-20 -right-20 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-cyan-500/10 blur-[90px] sm:blur-[120px]" />
       
-      {/* Bottom left emerald ambient glow */}
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-emerald-500/10 blur-[130px]" />
+      {/* Bottom left emerald ambient glow - scaled safely */}
+      <div className="absolute -bottom-20 -left-20 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-emerald-500/10 blur-[90px] sm:blur-[130px]" />
 
       {/* Center subtle glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-teal-500/5 blur-[140px]" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-80 sm:w-[500px] h-60 sm:h-[300px] bg-teal-500/5 blur-[100px]" />
 
-      {/* Tech circuit contour line graphics */}
+      {/* Tech circuit contour line graphics - hidden on small mobile screens to prevent RTL overflow */}
       <svg
-        className="absolute top-10 left-6 w-80 h-80 opacity-20 stroke-emerald-400"
+        className="absolute top-10 left-6 w-80 h-80 opacity-20 stroke-emerald-400 hidden md:block"
         fill="none"
         viewBox="0 0 200 200"
       >
@@ -28,7 +28,7 @@ export default function BackgroundEffects() {
       </svg>
 
       <svg
-        className="absolute top-16 right-10 w-96 h-96 opacity-15 stroke-cyan-400"
+        className="absolute top-16 right-10 w-96 h-96 opacity-15 stroke-cyan-400 hidden md:block"
         fill="none"
         viewBox="0 0 250 250"
       >
@@ -38,8 +38,8 @@ export default function BackgroundEffects() {
         <circle cx="10" cy="190" r="3" fill="#38bdf8" />
       </svg>
 
-      {/* Floating matrix numbers column matching screenshot right-hand side */}
-      <div className="absolute right-12 top-24 font-mono text-xs text-emerald-400/25 leading-relaxed hidden md:block">
+      {/* Floating matrix numbers column matching screenshot right-hand side - hidden on mobile */}
+      <div className="absolute right-12 top-24 font-mono text-xs text-emerald-400/25 leading-relaxed hidden lg:block">
         <div>0 &nbsp; 9 &nbsp; 1 &nbsp; 5 &nbsp; 9 &nbsp; 3#</div>
         <div>1 &nbsp; 0 &nbsp; 3 &nbsp; 2 &nbsp; 1 &nbsp; 10</div>
         <div>0 &nbsp; 2 &nbsp; 1 &nbsp; 5 &nbsp; 0 &nbsp; 5</div>
@@ -55,8 +55,8 @@ export default function BackgroundEffects() {
         <div>9 &nbsp; 0 &nbsp; 8 &nbsp; 3 &nbsp; 0 &nbsp; 0</div>
       </div>
 
-      {/* Dot matrix grid in bottom left corner matching screenshot */}
-      <div className="absolute bottom-10 left-10 grid grid-cols-4 gap-3 opacity-20 hidden sm:grid">
+      {/* Dot matrix grid in corner - hidden on mobile */}
+      <div className="absolute bottom-10 left-10 grid grid-cols-4 gap-3 opacity-20 hidden md:grid">
         {Array.from({ length: 24 }).map((_, i) => (
           <div key={i} className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
         ))}

@@ -67,7 +67,7 @@ export default function AppResultCard({
   });
 
   return (
-    <div className="w-full max-w-4xl mx-auto my-4 sm:my-8 bg-[#0a1426]/90 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl backdrop-blur-xl transition-all">
+    <div className="w-full max-w-full sm:max-w-4xl mx-auto my-3 sm:my-8 bg-[#0a1426]/90 border border-slate-800 rounded-2xl sm:rounded-3xl p-3 sm:p-8 shadow-2xl backdrop-blur-xl transition-all overflow-hidden">
       {/* Top Mobile/Desktop Action Bar: Home and Back Button */}
       <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-800/80">
         <div className="flex items-center gap-2">

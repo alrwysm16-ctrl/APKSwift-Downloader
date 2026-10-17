@@ -35,8 +35,8 @@ export default function NavigationBreadcrumb({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto my-3 px-3 sm:px-4">
-      <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 sm:p-4 rounded-2xl bg-[#0d1b33]/90 border border-slate-700/80 shadow-lg backdrop-blur-md">
+    <div className="w-full max-w-full sm:max-w-4xl mx-auto my-2 sm:my-3 px-2 sm:px-4 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 sm:p-4 rounded-2xl bg-[#0d1b33]/90 border border-slate-700/80 shadow-lg backdrop-blur-md max-w-full overflow-hidden">
         {/* Navigation Actions (Home & Back & Retry) with high touch target > 44px */}
         <div className="flex items-center gap-2">
           {/* Home Button */}

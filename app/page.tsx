@@ -189,7 +189,7 @@ export default function HomePage() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col justify-between pb-16 md:pb-0 ${
+      className={`min-h-screen w-full max-w-[100vw] overflow-x-hidden flex flex-col justify-between pb-24 md:pb-0 relative ${
         isOledMode ? 'bg-black' : 'bg-[#070c18]'
       }`}
     >
@@ -208,7 +208,7 @@ export default function HomePage() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6">
+      <main className="flex-1 w-full max-w-full sm:max-w-6xl mx-auto px-2.5 sm:px-6 overflow-hidden">
         {/* Navigation Breadcrumb bar with Home and Back buttons when an app is viewed */}
         {currentApp && (
           <NavigationBreadcrumb

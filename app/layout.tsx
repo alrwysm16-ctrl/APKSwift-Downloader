@@ -1,5 +1,13 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#070c18',
+};
 
 export const metadata: Metadata = {
   title: 'APK Downloader - تحميل ملفات APK مباشرة وسريعة من Google Play',
@@ -33,15 +41,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className="dark" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" className="dark overflow-x-hidden w-full max-w-[100vw]" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#070c18" />
         <link rel="preconnect" href="https://play-lh.googleusercontent.com" />
         <link rel="preconnect" href="https://lh3.googleusercontent.com" />
       </head>
       <body
         suppressHydrationWarning
-        className="min-h-screen bg-[#070c18] text-slate-100 antialiased selection:bg-emerald-500 selection:text-black"
+        className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#070c18] text-slate-100 antialiased selection:bg-emerald-500 selection:text-black relative"
       >
         {children}
       </body>

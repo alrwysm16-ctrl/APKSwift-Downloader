@@ -28,14 +28,14 @@ export default function MobileBottomNav({
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070c18]/95 border-t border-slate-800/90 backdrop-blur-lg px-2 py-1.5 shadow-2xl safe-area-pb"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#070c18]/95 border-t border-slate-800/90 backdrop-blur-xl px-2 py-1.5 shadow-2xl safe-area-pb w-full max-w-[100vw] overflow-hidden"
       aria-label="Mobile Navigation"
     >
-      <div className="flex items-center justify-around max-w-md mx-auto">
+      <div className="flex items-center justify-around max-w-md mx-auto w-full">
         {/* Home Button */}
         <button
           onClick={onGoHome}
-          className="flex flex-col items-center justify-center p-2 rounded-xl text-slate-300 hover:text-emerald-400 active:text-emerald-400 min-w-[56px] min-h-[48px] transition-colors"
+          className="flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-300 hover:text-emerald-400 active:text-emerald-400 min-w-[50px] min-h-[46px] transition-colors active:scale-95 cursor-pointer"
         >
           <Home className="w-5 h-5 text-emerald-400 mb-0.5" />
           <span className="text-[10px] font-bold">{isAr ? 'الرئيسية' : 'Home'}</span>
@@ -45,7 +45,7 @@ export default function MobileBottomNav({
         {hasActiveResult && (
           <button
             onClick={onGoBack}
-            className="flex flex-col items-center justify-center p-2 rounded-xl text-slate-300 hover:text-cyan-400 active:text-cyan-400 min-w-[56px] min-h-[48px] transition-colors"
+            className="flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-300 hover:text-cyan-400 active:text-cyan-400 min-w-[50px] min-h-[46px] transition-colors active:scale-95 cursor-pointer"
           >
             {isAr ? <ArrowRight className="w-5 h-5 text-cyan-400 mb-0.5" /> : <ArrowLeft className="w-5 h-5 text-cyan-400 mb-0.5" />}
             <span className="text-[10px] font-bold">{isAr ? 'رجوع' : 'Back'}</span>
@@ -55,7 +55,7 @@ export default function MobileBottomNav({
         {/* Sources button */}
         <button
           onClick={onOpenSources}
-          className="flex flex-col items-center justify-center p-2 rounded-xl text-slate-300 hover:text-purple-400 active:text-purple-400 min-w-[56px] min-h-[48px] transition-colors"
+          className="flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-300 hover:text-purple-400 active:text-purple-400 min-w-[50px] min-h-[46px] transition-colors active:scale-95 cursor-pointer"
         >
           <Layers className="w-5 h-5 text-purple-400 mb-0.5" />
           <span className="text-[10px] font-bold">{isAr ? 'المصادر' : 'Sources'}</span>
@@ -64,7 +64,7 @@ export default function MobileBottomNav({
         {/* Device Customization Specs */}
         <button
           onClick={onToggleSpecs}
-          className="flex flex-col items-center justify-center p-2 rounded-xl text-slate-300 hover:text-orange-400 active:text-orange-400 min-w-[56px] min-h-[48px] transition-colors"
+          className="flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-300 hover:text-orange-400 active:text-orange-400 min-w-[50px] min-h-[46px] transition-colors active:scale-95 cursor-pointer"
         >
           <Settings2 className="w-5 h-5 text-orange-400 mb-0.5" />
           <span className="text-[10px] font-bold">{isAr ? 'المواصفات' : 'Specs'}</span>
@@ -73,7 +73,7 @@ export default function MobileBottomNav({
         {/* Scroll To Top */}
         <button
           onClick={scrollToTop}
-          className="flex flex-col items-center justify-center p-2 rounded-xl text-slate-400 hover:text-white active:text-white min-w-[56px] min-h-[48px] transition-colors"
+          className="flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-400 hover:text-white active:text-white min-w-[50px] min-h-[46px] transition-colors active:scale-95 cursor-pointer"
         >
           <ArrowUp className="w-5 h-5 mb-0.5" />
           <span className="text-[10px] font-bold">{isAr ? 'أعلى' : 'Top'}</span>
