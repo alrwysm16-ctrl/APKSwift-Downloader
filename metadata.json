@@ -1,0 +1,6 @@
+{
+  "name": "APK Downloader - مباشر وسريع لملفات Google Play",
+  "description": "منصة حديثة وسريعة لتحميل ملفات APK و XAPK مباشرة من Google Play مع تخصيص المعمارية وإصدار أندرويد وكشف مواصفات الجهاز تلقائياً.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
