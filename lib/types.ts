@@ -1,3 +1,24 @@
+export type SourceId =
+  | 'all'
+  | 'gplay'
+  | 'apkpure'
+  | 'uptodown'
+  | 'apkcombo'
+  | 'apkmirror'
+  | 'apkfab'
+  | 'official';
+
+export interface SourceOption {
+  id: SourceId;
+  name: string;
+  nameAr: string;
+  type: 'direct_api' | 'cdn_mirror' | 'official_repo' | 'verified_portal';
+  badge: string;
+  url: string;
+  directDownloadCapable: boolean;
+  notes: string;
+}
+
 export interface DeviceSpecs {
   arch: 'arm64-v8a' | 'armeabi-v7a' | 'x86_64' | 'x86' | 'universal';
   androidVersion: string;
@@ -23,6 +44,7 @@ export interface ApkVariant {
   downloadUrl: string;
   isDirectDownload: boolean;
   source: string;
+  sourceId: SourceId;
   isCompatible?: boolean;
   compatibilityReason?: string;
   splits?: string[];
@@ -48,6 +70,7 @@ export interface AppDetails {
   screenshots: string[];
   googlePlayUrl: string;
   variants: ApkVariant[];
+  availableSources: SourceOption[];
   sourceOrigin: 'live_google_play' | 'verified_catalog' | 'gplay_api';
 }
 

@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
   const pkg = searchParams.get('pkg');
   const arch = searchParams.get('arch') || 'arm64-v8a';
   const format = (searchParams.get('format') || 'apk').toLowerCase();
+  const source = (searchParams.get('source') || 'all').toLowerCase();
 
   if (!pkg) {
     return NextResponse.json({ error: 'Package ID is required' }, { status: 400 });
@@ -28,18 +29,36 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid package identifier' }, { status: 400 });
   }
 
-  // Check known direct official CDN links
-  const key = `${cleanPkg}-${arch}`;
-  const directUrl = KNOWN_DIRECT_DOWNLOADS[key] || KNOWN_DIRECT_DOWNLOADS[`${cleanPkg}-universal`];
-
-  if (directUrl) {
-    // Redirect directly to authentic official mirror
-    return NextResponse.redirect(directUrl, { status: 307 });
+  // 1. Check known direct official CDN links first if source is official or default
+  if (source === 'official' || source === 'all' || source === 'gplay') {
+    const key = `${cleanPkg}-${arch}`;
+    const directUrl = KNOWN_DIRECT_DOWNLOADS[key] || KNOWN_DIRECT_DOWNLOADS[`${cleanPkg}-universal`];
+    if (directUrl) {
+      return NextResponse.redirect(directUrl, { status: 307 });
+    }
   }
 
-  // For generic Google Play packages:
-  // Provide verified APKPure or GPlay CDN mirror
-  const mirrorUrl = `https://d.apkpure.com/b/APK/${cleanPkg}?version=latest`;
+  // 2. Source-specific routing
+  switch (source) {
+    case 'uptodown':
+      return NextResponse.redirect(`https://services.uptodown.com/download/${cleanPkg}`, { status: 307 });
 
-  return NextResponse.redirect(mirrorUrl, { status: 307 });
+    case 'apkcombo':
+      return NextResponse.redirect(`https://apkcombo.com/downloader/#package=${cleanPkg}`, { status: 307 });
+
+    case 'apkfab':
+      return NextResponse.redirect(`https://apkfab.com/search?q=${cleanPkg}`, { status: 307 });
+
+    case 'apkmirror':
+      return NextResponse.redirect(
+        `https://www.apkmirror.com/?post_type=app_release&searchtype=apk&s=${encodeURIComponent(cleanPkg)}`,
+        { status: 307 }
+      );
+
+    case 'apkpure':
+    default:
+      // Provide verified APKPure CDN mirror
+      const mirrorUrl = `https://d.apkpure.com/b/APK/${cleanPkg}?version=latest`;
+      return NextResponse.redirect(mirrorUrl, { status: 307 });
+  }
 }

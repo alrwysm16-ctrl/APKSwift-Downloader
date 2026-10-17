@@ -5,11 +5,11 @@ import { DeviceSpecs } from '@/lib/types';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { url, deviceSpecs } = body;
+    const { url, deviceSpecs, source = 'all' } = body;
 
     if (!url || typeof url !== 'string') {
       return NextResponse.json(
-        { error: 'يرجى إدخال رابط صالح لتطبيق Google Play أو اسم الحزمة (Package ID).' },
+        { error: 'يرجى إدخال رابط صالح لتطبيق أو لعبة Google Play أو اسم الحزمة (Package ID).' },
         { status: 400 }
       );
     }
@@ -19,18 +19,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            'صيغة الرابط غير صحيحة. يرجى إدخال رابط Google Play (مثل: https://play.google.com/store/apps/details?id=com.whatsapp) أو اسم الحزمة مباشرة (مثل com.whatsapp).',
+            'صيغة الرابط غير صحيحة. يرجى إدخال رابط Google Play (مثل: https://play.google.com/store/apps/details?id=com.dts.freefireth أو com.whatsapp) أو اسم الحزمة مباشرة.',
         },
         { status: 400 }
       );
     }
 
     // Fetch live metadata
-    const appDetails = await scrapeGooglePlay(packageId);
+    const appDetails = await scrapeGooglePlay(packageId, source);
 
     // If user provided device specifications, annotate compatibility
     if (deviceSpecs && typeof deviceSpecs === 'object') {
-      appDetails.variants = matchDeviceVariants(appDetails.variants, deviceSpecs as DeviceSpecs);
+      appDetails.variants = matchDeviceVariants(appDetails.variants, deviceSpecs as DeviceSpecs, source);
     }
 
     return NextResponse.json({ success: true, appDetails });
