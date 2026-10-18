@@ -13,6 +13,8 @@ import {
   ArrowRight,
   ArrowLeft,
   RotateCcw,
+  ExternalLink,
+  AlertTriangle,
 } from 'lucide-react';
 import { ApkVariant, AppDetails } from '@/lib/types';
 
@@ -36,13 +38,23 @@ export default function DownloadModal({
   const [downloadSpeed, setDownloadSpeed] = useState('14.2 MB/s');
   const [isCompleted, setIsCompleted] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [officialUrl, setOfficialUrl] = useState<string | null>(null);
+  const [uptodownUrl, setUptodownUrl] = useState<string | null>(null);
 
   const filename = `${app.packageId}_v${variant.version}_${variant.architecture}.${variant.format.toLowerCase()}`;
 
   const triggerActualDownload = useCallback(async () => {
     try {
+      setErrorMessage(null);
       const res = await fetch(variant.downloadUrl);
-      if (!res.ok) throw new Error('Download failed');
+      if (!res.ok) {
+        let errData: any = {};
+        try {
+          errData = await res.json();
+        } catch {}
+        throw new Error(errData.error || (isAr ? 'تعذر التنزيل المباشر بسبب قيود أمنية أو حظر المصدر.' : 'Direct download failed due to source security restrictions.'));
+      }
       const blob = await res.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -54,16 +66,13 @@ export default function DownloadModal({
         document.body.removeChild(link);
         window.URL.revokeObjectURL(blobUrl);
       }, 1500);
-    } catch {
-      // Fallback
-      const link = document.createElement('a');
-      link.href = variant.downloadUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    } catch (err: any) {
+      setErrorMessage(err.message || (isAr ? 'حدث خطأ أثناء محاولة التنزيل المباشر' : 'Download error occurred'));
+      setOfficialUrl(app.googlePlayUrl || `https://play.google.com/store/apps/details?id=${app.packageId}`);
+      setUptodownUrl(`https://ar.uptodown.com/android/search/${encodeURIComponent(app.packageId)}`);
+      setIsCompleted(false);
     }
-  }, [variant.downloadUrl, filename]);
+  }, [variant.downloadUrl, filename, app.googlePlayUrl, app.packageId, isAr]);
 
   useEffect(() => {
     // Smooth progress animation followed by reliable blob download
@@ -71,7 +80,9 @@ export default function DownloadModal({
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          setIsCompleted(true);
+          if (!errorMessage) {
+            setIsCompleted(true);
+          }
           return 100;
         }
         const step = Math.floor(Math.random() * 25) + 20;
@@ -90,7 +101,7 @@ export default function DownloadModal({
     }, 280);
 
     return () => clearInterval(timer);
-  }, [triggerActualDownload]);
+  }, [triggerActualDownload, errorMessage]);
 
   const copyHash = () => {
     navigator.clipboard.writeText(variant.sha256);
@@ -100,6 +111,7 @@ export default function DownloadModal({
 
   const handleRestartDownload = () => {
     setProgress(30);
+    setErrorMessage(null);
     setIsCompleted(false);
     triggerActualDownload();
   };
@@ -141,14 +153,16 @@ export default function DownloadModal({
 
         {/* Modal Status Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
-            {isCompleted ? <CheckCircle2 className="w-6 h-6" /> : <Download className="w-6 h-6 animate-bounce" />}
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${errorMessage ? 'bg-rose-500/20 border border-rose-500/40 text-rose-400' : 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400'}`}>
+            {errorMessage ? <AlertTriangle className="w-6 h-6" /> : isCompleted ? <CheckCircle2 className="w-6 h-6" /> : <Download className="w-6 h-6 animate-bounce" />}
           </div>
           <div className="overflow-hidden">
             <h3 className="text-base sm:text-lg font-bold text-white truncate">
-              {isCompleted
-                ? isAr ? 'اكتمل تجهيز التنزيل!' : 'Download Ready!'
-                : isAr ? 'جاري تجهيز وتحميل الملف...' : 'Preparing & Downloading File...'}
+              {errorMessage
+                ? (isAr ? 'تنبيه: تعذر التنزيل المباشر' : 'Direct Download Restricted')
+                : isCompleted
+                ? (isAr ? 'اكتمل تجهيز التنزيل!' : 'Download Ready!')
+                : (isAr ? 'جاري تجهيز وتحميل الملف...' : 'Preparing & Downloading File...')}
             </h3>
             <p className="text-[11px] text-slate-400 font-mono truncate">
               {filename}
@@ -156,19 +170,55 @@ export default function DownloadModal({
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="my-4">
-          <div className="flex items-center justify-between text-xs mb-1.5 text-slate-300">
-            <span>{isCompleted ? (isAr ? '100% تم إرسال الملف' : '100% Complete') : downloadSpeed}</span>
-            <span className="font-bold text-emerald-400">{progress}%</span>
+        {/* Error Message & Official Fallback Links */}
+        {errorMessage ? (
+          <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs space-y-3 mb-4 text-rose-200">
+            <p className="leading-relaxed font-medium">{errorMessage}</p>
+            <p className="text-[11px] text-slate-300">
+              {isAr
+                ? 'حفاظاً على أمان جهازك وتجنب الملفات الوهمية أو المعطوبة، يرجى التنزيل مباشرة من الصفحات الرسمية المعتمدة أدناه:'
+                : 'To protect your device and prevent invalid files, please download directly from official verified sources below:'}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              {officialUrl && (
+                <a
+                  href={officialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-center"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>{isAr ? 'متجر Google Play الرسمي' : 'Official Google Play'}</span>
+                </a>
+              )}
+              {uptodownUrl && (
+                <a
+                  href={uptodownUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-center"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>{isAr ? 'منصة Uptodown الرسمية' : 'Official Uptodown'}</span>
+                </a>
+              )}
+            </div>
           </div>
-          <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-700 p-0.5">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-green-400 transition-all duration-300 shadow-md shadow-emerald-500/50"
-              style={{ width: `${progress}%` }}
-            />
+        ) : (
+          /* Progress Bar */
+          <div className="my-4">
+            <div className="flex items-center justify-between text-xs mb-1.5 text-slate-300">
+              <span>{isCompleted ? (isAr ? '100% تم إرسال الملف' : '100% Complete') : downloadSpeed}</span>
+              <span className="font-bold text-emerald-400">{progress}%</span>
+            </div>
+            <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-700 p-0.5">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-green-400 transition-all duration-300 shadow-md shadow-emerald-500/50"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* File & Security Info Box */}
         <div className="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 text-xs space-y-2 mb-4">
@@ -214,14 +264,16 @@ export default function DownloadModal({
 
         {/* Action Buttons: Direct link, restart, home */}
         <div className="space-y-2">
-          <button
-            type="button"
-            onClick={triggerActualDownload}
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer text-center active:scale-95"
-          >
-            <Download className="w-4 h-4 stroke-[2.5]" />
-            <span>{isAr ? 'اضغط هنا للتحميل المباشر الفوري للملف' : 'Click here to download directly now'}</span>
-          </button>
+          {!errorMessage && (
+            <button
+              type="button"
+              onClick={triggerActualDownload}
+              className="w-full min-h-[46px] py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer text-center active:scale-95"
+            >
+              <Download className="w-4 h-4 stroke-[2.5]" />
+              <span>{isAr ? 'اضغط هنا للتحميل المباشر الفوري للملف' : 'Click here to download directly now'}</span>
+            </button>
+          )}
 
           <div className="flex items-center gap-2">
             <button
@@ -248,8 +300,8 @@ export default function DownloadModal({
             <Usb className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
               {isAr
-                ? 'يدعم مرجع gplay-apk-downloader تثبيت ملفات Split APK المدمجة و WebUSB ADB عبر متصفح Chrome مباشرة.'
-                : 'Supports APKEditor split merging and WebUSB ADB direct device installation.'}
+                ? 'نظام التحميل الموثق يرفض تماماً أي ملفات وهمية أو معطوبة ويضمن سلامة حزم APK الأصلية.'
+                : 'Strict verification protocol eliminates fake or corrupted files and guarantees genuine APK packages.'}
             </p>
           </div>
         </div>
