@@ -39,43 +39,21 @@ export default function DownloadModal({
   const [isCompleted, setIsCompleted] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [officialUrl, setOfficialUrl] = useState<string | null>(null);
-  const [uptodownUrl, setUptodownUrl] = useState<string | null>(null);
 
   const filename = `${app.packageId}_v${variant.version}_${variant.architecture}.${variant.format.toLowerCase()}`;
 
-  const triggerActualDownload = useCallback(async () => {
+  const triggerActualDownload = useCallback(() => {
     try {
       setErrorMessage(null);
-      const res = await fetch(variant.downloadUrl);
-      if (!res.ok) {
-        let errData: any = {};
-        try {
-          errData = await res.json();
-        } catch {}
-        throw new Error(errData.error || (isAr ? 'تعذر التنزيل المباشر بسبب قيود أمنية أو حظر المصدر.' : 'Direct download failed due to source security restrictions.'));
-      }
-      const blob = await res.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-      }, 1500);
+      window.open(variant.downloadUrl, '_blank', 'noopener,noreferrer');
+      setIsCompleted(true);
     } catch (err: any) {
-      setErrorMessage(err.message || (isAr ? 'حدث خطأ أثناء محاولة التنزيل المباشر' : 'Download error occurred'));
-      setOfficialUrl(app.googlePlayUrl || `https://play.google.com/store/apps/details?id=${app.packageId}`);
-      setUptodownUrl(`https://ar.uptodown.com/android/search/${encodeURIComponent(app.packageId)}`);
-      setIsCompleted(false);
+      setErrorMessage(err.message || (isAr ? 'تعذر فتح رابط المصدر الرسمي' : 'Could not open official source link'));
     }
-  }, [variant.downloadUrl, filename, app.googlePlayUrl, app.packageId, isAr]);
+  }, [variant.downloadUrl, isAr]);
 
   useEffect(() => {
-    // Smooth progress animation followed by reliable blob download
+    // Smooth progress animation followed by opening official source directly
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -98,7 +76,7 @@ export default function DownloadModal({
         }
         return nextVal;
       });
-    }, 280);
+    }, 250);
 
     return () => clearInterval(timer);
   }, [triggerActualDownload, errorMessage]);
@@ -159,10 +137,10 @@ export default function DownloadModal({
           <div className="overflow-hidden">
             <h3 className="text-base sm:text-lg font-bold text-white truncate">
               {errorMessage
-                ? (isAr ? 'تنبيه: تعذر التنزيل المباشر' : 'Direct Download Restricted')
+                ? (isAr ? 'تنبيه: تعذر فتح الرابط' : 'Link Open Error')
                 : isCompleted
-                ? (isAr ? 'اكتمل تجهيز التنزيل!' : 'Download Ready!')
-                : (isAr ? 'جاري تجهيز وتحميل الملف...' : 'Preparing & Downloading File...')}
+                ? (isAr ? 'تم توجيهك للمصدر الرسمي بنجاح!' : 'Official Source Opened Successfully!')
+                : (isAr ? 'جاري فتح المصدر الرسمي للملف...' : 'Opening Official Source...')}
             </h3>
             <p className="text-[11px] text-slate-400 font-mono truncate">
               {filename}
@@ -170,45 +148,33 @@ export default function DownloadModal({
           </div>
         </div>
 
-        {/* Error Message & Official Fallback Links */}
-        {errorMessage ? (
+        {/* Success / Redirect Notice */}
+        {isCompleted && !errorMessage ? (
+          <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-xs space-y-3 mb-4 text-emerald-200">
+            <p className="leading-relaxed font-medium">
+              {isAr
+                ? `تم فتح المصدر الرسمي المعتمد (${variant.source}) في تبويب جديد لتنزيل الملف الأصلي بحرية وبدون قيود.`
+                : `Successfully opened official verified source (${variant.source}) in a new tab for direct downloading.`}
+            </p>
+            <a
+              href={variant.downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-center"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>{isAr ? 'إعادة فتح صفحة التحميل الرسمية' : 'Re-open Official Download Page'}</span>
+            </a>
+          </div>
+        ) : errorMessage ? (
           <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs space-y-3 mb-4 text-rose-200">
             <p className="leading-relaxed font-medium">{errorMessage}</p>
-            <p className="text-[11px] text-slate-300">
-              {isAr
-                ? 'حفاظاً على أمان جهازك وتجنب الملفات الوهمية أو المعطوبة، يرجى التنزيل مباشرة من الصفحات الرسمية المعتمدة أدناه:'
-                : 'To protect your device and prevent invalid files, please download directly from official verified sources below:'}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2 pt-1">
-              {officialUrl && (
-                <a
-                  href={officialUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-center"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>{isAr ? 'متجر Google Play الرسمي' : 'Official Google Play'}</span>
-                </a>
-              )}
-              {uptodownUrl && (
-                <a
-                  href={uptodownUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-center"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>{isAr ? 'منصة Uptodown الرسمية' : 'Official Uptodown'}</span>
-                </a>
-              )}
-            </div>
           </div>
         ) : (
           /* Progress Bar */
           <div className="my-4">
             <div className="flex items-center justify-between text-xs mb-1.5 text-slate-300">
-              <span>{isCompleted ? (isAr ? '100% تم إرسال الملف' : '100% Complete') : downloadSpeed}</span>
+              <span>{isCompleted ? (isAr ? '100% جاهز' : '100% Ready') : downloadSpeed}</span>
               <span className="font-bold text-emerald-400">{progress}%</span>
             </div>
             <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-700 p-0.5">
@@ -264,16 +230,14 @@ export default function DownloadModal({
 
         {/* Action Buttons: Direct link, restart, home */}
         <div className="space-y-2">
-          {!errorMessage && (
-            <button
-              type="button"
-              onClick={triggerActualDownload}
-              className="w-full min-h-[46px] py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer text-center active:scale-95"
-            >
-              <Download className="w-4 h-4 stroke-[2.5]" />
-              <span>{isAr ? 'اضغط هنا للتحميل المباشر الفوري للملف' : 'Click here to download directly now'}</span>
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={triggerActualDownload}
+            className="w-full min-h-[46px] py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer text-center active:scale-95"
+          >
+            <ExternalLink className="w-4 h-4 stroke-[2.5]" />
+            <span>{isAr ? 'فتح صفحة التحميل الرسمية مباشرة' : 'Open Official Download Page Directly'}</span>
+          </button>
 
           <div className="flex items-center gap-2">
             <button
@@ -281,7 +245,7 @@ export default function DownloadModal({
               className="flex-1 min-h-[42px] py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>{isAr ? 'إعادة التنزيل' : 'Restart Download'}</span>
+              <span>{isAr ? 'إعادة الفتح' : 'Re-open'}</span>
             </button>
 
             {onGoHome && (
@@ -295,13 +259,13 @@ export default function DownloadModal({
             )}
           </div>
 
-          {/* WebUSB ADB note */}
+          {/* Note */}
           <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2">
             <Usb className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
               {isAr
-                ? 'نظام التحميل الموثق يرفض تماماً أي ملفات وهمية أو معطوبة ويضمن سلامة حزم APK الأصلية.'
-                : 'Strict verification protocol eliminates fake or corrupted files and guarantees genuine APK packages.'}
+                ? 'التحميل من المصدر الرسمي المعتمد يضمن الحصول على الملفات الأصلية بدون أي قيود أو حظر للسيرفرات.'
+                : 'Downloading directly from official verified sources ensures authentic files without server proxy limits.'}
             </p>
           </div>
         </div>

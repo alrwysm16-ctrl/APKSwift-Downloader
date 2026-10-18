@@ -84,6 +84,7 @@ export interface AppDetails {
   variants: ApkVariant[];
   availableSources: SourceOption[];
   sourceOrigin: 'live_google_play' | 'verified_catalog' | 'gplay_api';
+  originalDownloadUrl?: string;
 }
 
 export interface SearchHistoryItem {

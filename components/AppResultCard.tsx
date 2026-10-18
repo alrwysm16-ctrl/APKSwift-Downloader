@@ -73,6 +73,17 @@ export default function AppResultCard({
   const [formatFilter, setFormatFilter] = useState<'all' | 'apk' | 'xapk'>('all');
   const [sourceFilter, setSourceFilter] = useState<SourceId | 'all'>('all');
 
+  const [customDownloadUrl, setCustomDownloadUrl] = useState(app.originalDownloadUrl || app.variants[0]?.downloadUrl || '');
+  const [isEditingUrl, setIsEditingUrl] = useState(false);
+
+  const handleInitiateDownload = (variant: ApkVariant) => {
+    const targetUrl = customDownloadUrl || app.originalDownloadUrl || variant.downloadUrl;
+    onInitiateDownload({
+      ...variant,
+      downloadUrl: targetUrl,
+    });
+  };
+
   const availableSourceIds = React.useMemo(() => {
     const list: SourceId[] = [];
     app.variants.forEach((v) => {
@@ -193,6 +204,43 @@ export default function AppResultCard({
             <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
           </a>
         </div>
+      </div>
+
+      {/* Admin Field: Original Download URL */}
+      <div className="my-4 p-4 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
+        <div className="flex items-center justify-between text-slate-300 font-bold">
+          <span className="flex items-center gap-1.5 text-cyan-400">
+            <Globe2 className="w-4 h-4" />
+            <span>{isAr ? 'رابط التحميل الأصلي (Admin Original Download URL):' : 'Original Download URL:'}</span>
+          </span>
+          <button
+            onClick={() => setIsEditingUrl(!isEditingUrl)}
+            className="text-emerald-400 hover:underline text-[11px] cursor-pointer"
+          >
+            {isEditingUrl ? (isAr ? 'حفظ' : 'Save') : (isAr ? 'تعديل الرابط' : 'Edit URL')}
+          </button>
+        </div>
+        {isEditingUrl ? (
+          <div className="flex gap-2 pt-1">
+            <input
+              type="url"
+              value={customDownloadUrl}
+              onChange={(e) => setCustomDownloadUrl(e.target.value)}
+              placeholder="https://ar.uptodown.com/android/..."
+              className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-emerald-500 font-mono"
+            />
+            <button
+              onClick={() => setIsEditingUrl(false)}
+              className="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs cursor-pointer"
+            >
+              {isAr ? 'تطبيق' : 'Apply'}
+            </button>
+          </div>
+        ) : (
+          <p className="font-mono text-slate-400 truncate text-[11px] select-all">
+            {customDownloadUrl || app.originalDownloadUrl || app.variants[0]?.downloadUrl}
+          </p>
+        )}
       </div>
 
       {/* Device Compatibility Status Banner */}
@@ -414,7 +462,7 @@ export default function AppResultCard({
 
                   {/* Primary Download Button */}
                   <button
-                    onClick={() => onInitiateDownload(variant)}
+                    onClick={() => handleInitiateDownload(variant)}
                     className="flex-1 sm:flex-initial min-h-[44px] px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
                   >
                     <Download className="w-4 h-4 stroke-[2.5]" />
@@ -466,7 +514,7 @@ export default function AppResultCard({
                         app.variants.find((item) => item.sourceId === source.id && item.format === 'APK') ||
                         app.variants.find((item) => item.sourceId === source.id) ||
                         app.variants[0];
-                      onInitiateDownload(v);
+                      handleInitiateDownload(v);
                     }}
                     className="flex-1 min-h-[40px] px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
                   >
@@ -479,7 +527,7 @@ export default function AppResultCard({
                       type="button"
                       onClick={() => {
                         const v = app.variants.find((item) => item.sourceId === source.id && item.format === 'XAPK')!;
-                        onInitiateDownload(v);
+                        handleInitiateDownload(v);
                       }}
                       className="min-h-[40px] px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shadow-purple-500/20"
                     >

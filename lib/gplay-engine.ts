@@ -263,7 +263,7 @@ export async function fetchGooglePlayDetails(
   // 10. Generate genuine Google Play variants directly from Google Play engine
   const targetArch = deviceSpecs?.arch || 'arm64-v8a';
 
-  const variants: ApkVariant[] = [
+  const rawVariants: any[] = [
     {
       id: `${packageId}-gplay-arm64`,
       format: 'APK',
@@ -770,6 +770,11 @@ export async function fetchGooglePlayDetails(
     },
   ];
 
+  const variants: ApkVariant[] = rawVariants.map((v) => ({
+    ...v,
+    downloadUrl: getSourceOfficialUrl(v.sourceId, packageId),
+  }));
+
   const availableSources: SourceOption[] = [
     {
       id: 'gplay',
@@ -971,6 +976,7 @@ export async function fetchGooglePlayDetails(
     description,
     screenshots: screenshots.length > 0 ? screenshots : [icon],
     googlePlayUrl: `https://play.google.com/store/apps/details?id=${encodeURIComponent(packageId)}`,
+    originalDownloadUrl: getSourceOfficialUrl('uptodown', packageId, title),
     variants,
     availableSources,
     sourceOrigin: 'gplay_api',
@@ -1092,4 +1098,57 @@ function generateHash(str: string): string {
   }
   const hex = Math.abs(hash).toString(16).padStart(8, '0');
   return `${hex}e4921b79e95f1d0b3a985d2bf61a9bc2518e9043c983a54b9d031c28fa`;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'app';
+}
+
+function getSourceOfficialUrl(sourceId: string, packageId: string, title: string = ''): string {
+  const slug = slugify(title || packageId);
+  switch (sourceId) {
+    case 'gplay':
+      return `https://play.google.com/store/apps/details?id=${packageId}`;
+    case 'uptodown':
+      return `https://${slug}.ar.uptodown.com/android`;
+    case 'apkpure':
+      return `https://apkpure.net/${slug}/${packageId}`;
+    case 'apkcombo':
+      return `https://apkcombo.com/apk/${packageId}`;
+    case 'apkfab':
+      return `https://apkfab.com/${slug}/${packageId}`;
+    case 'apkmirror':
+      return `https://www.apkmirror.com/apk/${slug.replace(/-/g, '')}/`;
+    case 'apksupport':
+      return `https://apk.support/app/${packageId}`;
+    case 'apkmonk':
+      return `https://www.apkmonk.com/app/${packageId}/`;
+    case 'apkcube':
+      return `https://apkcube.com/${packageId}`;
+    case 'captaindroid':
+      return `https://captain-droid.com/en/games/${slug}/`;
+    case 'igetapk':
+      return `https://igetapk.com/app/${packageId}`;
+    case 'apkpremier':
+      return `https://apkpremier.com/download/${packageId}`;
+    case 'apkgk':
+      return `https://apkgk.com/app/${packageId}`;
+    case 'apksos':
+      return `https://apksos.com/app/${packageId}`;
+    case 'rawapk':
+      return `https://rawapk.com/app/${packageId}`;
+    case 'apkhere':
+      return `https://www.apkhere.com/app/${packageId}`;
+    case 'apkflea':
+      return `https://apkflea.com/app/${packageId}`;
+    case 'apklister':
+      return `https://apklister.com/app/${packageId}`;
+    default:
+      return `https://${slug}.ar.uptodown.com/android`;
+  }
 }
