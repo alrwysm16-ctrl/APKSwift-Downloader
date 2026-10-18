@@ -1,11 +1,23 @@
 export type SourceId =
   | 'all'
   | 'gplay'
-  | 'apkpure'
   | 'uptodown'
+  | 'apkcube'
+  | 'captaindroid'
+  | 'igetapk'
+  | 'apkpure'
   | 'apkcombo'
   | 'apkmirror'
   | 'apkfab'
+  | 'apksupport'
+  | 'apkmonk'
+  | 'apkpremier'
+  | 'apkgk'
+  | 'apksos'
+  | 'rawapk'
+  | 'apkhere'
+  | 'apkflea'
+  | 'apklister'
   | 'official';
 
 export interface SourceOption {

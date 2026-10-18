@@ -25,12 +25,24 @@ export default function NavigationBreadcrumb({
 
   const sourceLabels: Record<SourceId, string> = {
     all: isAr ? 'جميع المصادر المتعددة' : 'Multi-Source Search',
-    gplay: 'Google Play',
-    apkpure: 'APKPure',
-    uptodown: 'Uptodown',
+    gplay: isAr ? 'سيرفر Google Play المباشر' : 'Google Play Direct',
+    uptodown: isAr ? 'منصة Uptodown العربية' : 'Uptodown',
+    apkcube: isAr ? 'موقع APKCube' : 'APKCube',
+    captaindroid: isAr ? 'كابتن درويد Captain Droid' : 'Captain Droid',
+    igetapk: isAr ? 'موقع iGetAPK' : 'iGetAPK',
+    apkpure: 'APKPure CDN',
     apkcombo: 'APKCombo',
     apkmirror: 'APKMirror',
     apkfab: 'APKFab',
+    apksupport: 'APKSupport',
+    apkmonk: 'APKMonk',
+    apkpremier: isAr ? 'منصة APK Premier النادرة' : 'APK Premier',
+    apkgk: isAr ? 'مستودع APKGK المستقل' : 'APKGK Vault',
+    apksos: isAr ? 'شبكة APKSOS السحابية' : 'APKSOS Cloud',
+    rawapk: isAr ? 'خادم RawAPK للحزم الخام' : 'RawAPK Clean Vault',
+    apkhere: isAr ? 'أرشيف ApkHere للألعاب' : 'ApkHere Archive',
+    apkflea: isAr ? 'شبكة APKFlea الخفيفة' : 'APKFlea Lite',
+    apklister: isAr ? 'محرك APKLister المباشر' : 'APKLister Direct',
     official: isAr ? 'المطور الرسمي' : 'Official Repo',
   };
 

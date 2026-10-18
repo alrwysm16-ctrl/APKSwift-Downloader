@@ -39,7 +39,7 @@ export default function HomePage() {
   const [lang, setLang] = useState<'ar' | 'en'>('ar');
   const [isOledMode, setIsOledMode] = useState(false);
 
-  // Search input and source state kept across steps
+  // Search input and source state kept across steps (All sources enabled by default)
   const [inputUrl, setInputUrl] = useState('');
   const [selectedSource, setSelectedSource] = useState<SourceId>('all');
 

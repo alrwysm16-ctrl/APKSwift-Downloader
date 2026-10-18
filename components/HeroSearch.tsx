@@ -34,16 +34,29 @@ interface HeroSearchProps {
 }
 
 const SOURCES_LIST: { id: SourceId; name: string; nameAr: string; badge: string; color: string }[] = [
-  { id: 'all', name: 'All Sources', nameAr: 'جميع المصادر', badge: 'أفضل تطابق', color: 'text-emerald-400 border-emerald-500/40 bg-emerald-950/40' },
-  { id: 'gplay', name: 'Google Play', nameAr: 'Google Play', badge: 'رسمي', color: 'text-cyan-400 border-cyan-500/40 bg-cyan-950/40' },
-  { id: 'apkpure', name: 'APKPure', nameAr: 'APKPure', badge: 'سريع', color: 'text-teal-400 border-teal-500/40 bg-teal-950/40' },
-  { id: 'uptodown', name: 'Uptodown', nameAr: 'Uptodown', badge: 'آمن', color: 'text-blue-400 border-blue-500/40 bg-blue-950/40' },
-  { id: 'apkcombo', name: 'APKCombo', nameAr: 'APKCombo', badge: 'حزم', color: 'text-amber-400 border-amber-500/40 bg-amber-950/40' },
-  { id: 'apkmirror', name: 'APKMirror', nameAr: 'APKMirror', badge: 'تشفير', color: 'text-orange-400 border-orange-500/40 bg-orange-950/40' },
-  { id: 'apkfab', name: 'APKFab', nameAr: 'APKFab', badge: 'XAPK', color: 'text-purple-400 border-purple-500/40 bg-purple-950/40' },
+  { id: 'all', name: 'All Multi-Sources', nameAr: 'جميع المصادر (الكل)', badge: 'شامل ومباشر', color: 'text-cyan-400 border-cyan-500/50 bg-cyan-950/60' },
+  { id: 'uptodown', name: 'Uptodown Arabic', nameAr: 'منصة Uptodown العربية', badge: 'تحميل مباشر فوري', color: 'text-blue-400 border-blue-500/50 bg-blue-950/60' },
+  { id: 'gplay', name: 'Google Play Direct Engine', nameAr: 'سيرفر Google Play المباشر', badge: 'تخطي الحظر الجغرافي', color: 'text-emerald-400 border-emerald-500/50 bg-emerald-950/50' },
+  { id: 'apkcube', name: 'APKCube', nameAr: 'موقع APKCube السريع', badge: 'خوادم سريعة', color: 'text-rose-400 border-rose-500/40 bg-rose-950/40' },
+  { id: 'captaindroid', name: 'Captain Droid', nameAr: 'كابتن درويد Captain Droid', badge: 'ألعاب وتطبيقات', color: 'text-indigo-400 border-indigo-500/40 bg-indigo-950/40' },
+  { id: 'igetapk', name: 'iGetAPK', nameAr: 'موقع iGetAPK المباشر', badge: 'تحميل فوري', color: 'text-fuchsia-400 border-fuchsia-500/40 bg-fuchsia-950/40' },
+  { id: 'apkpure', name: 'APKPure CDN', nameAr: 'سيرفرات APKPure', badge: 'فائق السرعة', color: 'text-teal-400 border-teal-500/40 bg-teal-950/40' },
+  { id: 'apkcombo', name: 'APKCombo', nameAr: 'محرك APKCombo', badge: 'حزم ومعماريات', color: 'text-amber-400 border-amber-500/40 bg-amber-950/40' },
+  { id: 'apkfab', name: 'APKFab', nameAr: 'مستودع APKFab', badge: 'ألعاب ضخمة & XAPK', color: 'text-purple-400 border-purple-500/40 bg-purple-950/40' },
+  { id: 'apksupport', name: 'APKSupport', nameAr: 'سيرفرات APKSupport', badge: 'تحميل دائم', color: 'text-lime-400 border-lime-500/40 bg-lime-950/40' },
+  { id: 'apkmonk', name: 'APKMonk', nameAr: 'مكتبة APKMonk', badge: 'أرشيف موثق', color: 'text-emerald-300 border-emerald-500/40 bg-emerald-950/40' },
+  { id: 'apkmirror', name: 'APKMirror', nameAr: 'أرشيف APKMirror', badge: 'تشفير رسمي', color: 'text-orange-400 border-orange-500/40 bg-orange-950/40' },
+  { id: 'apkpremier', name: 'APK Premier', nameAr: 'منصة APK Premier النادرة', badge: 'سيرفر خاص حصري', color: 'text-violet-400 border-violet-500/40 bg-violet-950/40' },
+  { id: 'apkgk', name: 'APKGK', nameAr: 'مستودع APKGK المستقل', badge: 'مستقل ونادر', color: 'text-amber-300 border-amber-500/40 bg-amber-950/40' },
+  { id: 'apksos', name: 'APKSOS', nameAr: 'شبكة APKSOS السحابية', badge: 'سرعة سحابية', color: 'text-sky-400 border-sky-500/40 bg-sky-950/40' },
+  { id: 'rawapk', name: 'RawAPK', nameAr: 'خادم RawAPK للحزم الخام', badge: 'ملفات خام نقية', color: 'text-emerald-400 border-emerald-500/40 bg-emerald-950/40' },
+  { id: 'apkhere', name: 'ApkHere', nameAr: 'أرشيف ApkHere للألعاب', badge: 'أرشيف ألعاب نادر', color: 'text-rose-300 border-rose-500/40 bg-rose-950/40' },
+  { id: 'apkflea', name: 'APKFlea', nameAr: 'شبكة APKFlea الخفيفة', badge: 'فائق السرعة', color: 'text-pink-400 border-pink-500/40 bg-pink-950/40' },
+  { id: 'apklister', name: 'APKLister', nameAr: 'محرك APKLister المباشر', badge: 'تحميل مباشر تلقائي', color: 'text-cyan-300 border-cyan-500/40 bg-cyan-950/40' },
 ];
 
 const POPULAR_GAMES = [
+  { name: 'Overnight 2 Mobile', id: 'com.HorrorGamer.Overnight2Mobile', icon: '🎮' },
   { name: 'Subway Surfers', id: 'com.kiloo.subwaysurf', icon: '🏃' },
   { name: 'Free Fire', id: 'com.dts.freefireth', icon: '🔥' },
   { name: 'Roblox', id: 'com.roblox.client', icon: '🧱' },
@@ -124,8 +137,14 @@ export default function HeroSearch({
             <Globe2 className="w-3.5 h-3.5 text-cyan-400" />
             <span>{isAr ? 'المصدر المستهدف:' : 'Source:'}</span>
           </span>
-          <span className="text-[10px] text-emerald-400 truncate max-w-[200px]">
-            {isAr ? 'يدعم APKPure, Uptodown, APKCombo' : 'Supports Multi-Mirrors'}
+          <span className="text-[10px] text-cyan-300 truncate max-w-[320px] font-semibold">
+            {isAr
+              ? selectedSource === 'all'
+                ? 'جميع المصادر مفعلة (Uptodown, Google Play, APKCube, Captain Droid...)'
+                : selectedSource === 'uptodown'
+                ? 'مفعل: منصة Uptodown العربية (تحميل مباشر فوري)'
+                : `المصدر المفعل: ${SOURCES_LIST.find((s) => s.id === selectedSource)?.nameAr || selectedSource}`
+              : `Active: ${SOURCES_LIST.find((s) => s.id === selectedSource)?.name || selectedSource}`}
           </span>
         </div>
 

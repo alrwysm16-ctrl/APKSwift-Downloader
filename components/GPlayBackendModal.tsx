@@ -107,8 +107,8 @@ export default function GPlayBackendModal({ onClose, lang }: GPlayBackendModalPr
               </p>
               <p className="text-slate-400 text-xs">
                 {isAr
-                  ? 'عند التعطيل، تستخدم المنصة المرايا الموثوقة والمباشرة تلقائياً.'
-                  : 'When disabled, cloud verified high-speed mirrors are used automatically.'}
+                  ? 'عند التعطيل، تستخدم المنصة محرك Google Play Direct Engine الأصلي المدمج مجاناً.'
+                  : 'When disabled, the native built-in Google Play Direct Engine is used.'}
               </p>
             </div>
             <input

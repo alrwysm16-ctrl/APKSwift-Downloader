@@ -35,6 +35,29 @@ interface AppResultCardProps {
   lang: 'ar' | 'en';
 }
 
+const SOURCE_NAMES: Record<string, { ar: string; en: string }> = {
+  all: { ar: 'جميع المصادر', en: 'All Sources' },
+  uptodown: { ar: 'منصة Uptodown العربية', en: 'Uptodown' },
+  gplay: { ar: 'Google Play', en: 'Google Play' },
+  apkcube: { ar: 'APKCube', en: 'APKCube' },
+  captaindroid: { ar: 'Captain Droid', en: 'Captain Droid' },
+  igetapk: { ar: 'iGetAPK', en: 'iGetAPK' },
+  apkpure: { ar: 'APKPure', en: 'APKPure' },
+  apkcombo: { ar: 'APKCombo', en: 'APKCombo' },
+  apkmirror: { ar: 'APKMirror', en: 'APKMirror' },
+  apkfab: { ar: 'APKFab', en: 'APKFab' },
+  apksupport: { ar: 'APKSupport', en: 'APKSupport' },
+  apkmonk: { ar: 'APKMonk', en: 'APKMonk' },
+  apkpremier: { ar: 'APK Premier', en: 'APK Premier' },
+  apkgk: { ar: 'APKGK', en: 'APKGK' },
+  apksos: { ar: 'APKSOS', en: 'APKSOS' },
+  rawapk: { ar: 'RawAPK', en: 'RawAPK' },
+  apkhere: { ar: 'ApkHere', en: 'ApkHere' },
+  apkflea: { ar: 'APKFlea', en: 'APKFlea' },
+  apklister: { ar: 'APKLister', en: 'APKLister' },
+  official: { ar: 'المطور الرسمي', en: 'Official' },
+};
+
 export default function AppResultCard({
   app,
   deviceSpecs,
@@ -49,6 +72,16 @@ export default function AppResultCard({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [formatFilter, setFormatFilter] = useState<'all' | 'apk' | 'xapk'>('all');
   const [sourceFilter, setSourceFilter] = useState<SourceId | 'all'>('all');
+
+  const availableSourceIds = React.useMemo(() => {
+    const list: SourceId[] = [];
+    app.variants.forEach((v) => {
+      if (v.sourceId && !list.includes(v.sourceId)) {
+        list.push(v.sourceId);
+      }
+    });
+    return list;
+  }, [app.variants]);
 
   const handleCopyLink = (variant: ApkVariant) => {
     const fullUrl = variant.downloadUrl.startsWith('http')
@@ -259,21 +292,38 @@ export default function AppResultCard({
               ))}
             </div>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
-              <span>{isAr ? 'المصدر:' : 'Source:'}</span>
-              {(['all', 'apkpure', 'uptodown', 'apkcombo', 'apkfab', 'official'] as const).map((src) => (
-                <button
-                  key={src}
-                  onClick={() => setSourceFilter(src)}
-                  className={`min-h-[34px] px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
-                    sourceFilter === src
-                      ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40 font-bold'
-                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                  }`}
-                >
-                  {src === 'all' ? (isAr ? 'جميع المصادر' : 'All') : src.toUpperCase()}
-                </button>
-              ))}
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 scrollbar-none">
+              <span className="shrink-0">{isAr ? 'المصدر:' : 'Source:'}</span>
+              <button
+                key="all"
+                onClick={() => setSourceFilter('all')}
+                className={`min-h-[34px] px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer shrink-0 ${
+                  sourceFilter === 'all'
+                    ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40 font-bold'
+                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                {isAr ? 'جميع المصادر' : 'All'} ({app.variants.length})
+              </button>
+              {availableSourceIds.map((src) => {
+                const count = app.variants.filter((v) => v.sourceId === src).length;
+                const sourceMeta = SOURCE_NAMES[src];
+                const label = sourceMeta ? (isAr ? sourceMeta.ar : sourceMeta.en) : src.toUpperCase();
+                return (
+                  <button
+                    key={src}
+                    onClick={() => setSourceFilter(src)}
+                    className={`min-h-[34px] px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer shrink-0 ${
+                      sourceFilter === src
+                        ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40 font-bold shadow-sm shadow-emerald-500/30'
+                        : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                    }`}
+                  >
+                    <span>{label}</span>
+                    <span className="text-[10px] opacity-75 font-normal ml-1 mr-1">({count})</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -377,18 +427,18 @@ export default function AppResultCard({
         </div>
       )}
 
-      {/* Tab 2: Available Multi-Sources (APKPure, Uptodown, APKCombo, APKMirror, APKFab, Google Play) */}
+      {/* Tab 2: Available Multi-Sources (Uptodown, APKCube, Captain Droid, iGetAPK, Google Play, APKPure, etc.) */}
       {activeTab === 'sources' && (
         <div className="space-y-4 text-right rtl:text-right ltr:text-left">
           <div className="p-3.5 rounded-2xl bg-cyan-950/30 border border-cyan-500/30 text-xs text-cyan-200">
             <p className="font-bold mb-1 flex items-center gap-1.5 text-sm text-cyan-300">
               <Globe2 className="w-4 h-4" />
-              <span>{isAr ? 'تكامل المصادر والمرايا المتعددة المعتمدة' : 'Multi-Source Mirror Integration'}</span>
+              <span>{isAr ? 'تكامل سيرفرات التحميل المباشر بدون إعلانات أو تسجيل دخول' : 'Direct Download Multi-Sources & Mirrors'}</span>
             </p>
             <p className="leading-relaxed opacity-90">
               {isAr
-                ? 'لا نعتمد على مصدر واحد فقط؛ يمكنك التنزيل عبر APKPure أو Uptodown أو APKCombo أو APKFab أو Google Play الرسمي مع فحص أمني وتشفيري كامل.'
-                : 'Download directly or browse verified repositories across APKPure, Uptodown, APKCombo, APKMirror, and APKFab.'}
+                ? 'جميع المصادر والمواقع أدناه تدعم التحميل المباشر الفوري لملف APK أو XAPK بدون الحاجة لدخول الموقع المصدر أو تسجيل دخول، حتى لو كانت اللعبة محظورة في منطقتك الجغرافية.'
+                : 'All sources below stream real APK and XAPK packages directly without requiring login or visiting third-party sites.'}
             </p>
           </div>
 
@@ -400,7 +450,7 @@ export default function AppResultCard({
               >
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-white text-sm">{source.name}</span>
+                    <span className="font-bold text-white text-sm">{isAr ? source.nameAr : source.name}</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-cyan-300 border border-slate-700">
                       {source.badge}
                     </span>
@@ -408,28 +458,47 @@ export default function AppResultCard({
                   <p className="text-xs text-slate-400 leading-relaxed">{source.notes}</p>
                 </div>
 
-                <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
-                  {source.directDownloadCapable ? (
-                    <a
-                      href={`/api/download?pkg=${app.packageId}&source=${source.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 min-h-[40px] px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                <div className="flex items-center gap-2 pt-2 border-t border-slate-800 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const v =
+                        app.variants.find((item) => item.sourceId === source.id && item.format === 'APK') ||
+                        app.variants.find((item) => item.sourceId === source.id) ||
+                        app.variants[0];
+                      onInitiateDownload(v);
+                    }}
+                    className="flex-1 min-h-[40px] px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
+                  >
+                    <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>{isAr ? `تحميل APK مباشر (${source.name})` : `Direct APK (${source.name})`}</span>
+                  </button>
+
+                  {app.variants.some((item) => item.sourceId === source.id && item.format === 'XAPK') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const v = app.variants.find((item) => item.sourceId === source.id && item.format === 'XAPK')!;
+                        onInitiateDownload(v);
+                      }}
+                      className="min-h-[40px] px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shadow-purple-500/20"
                     >
-                      <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>{isAr ? `تنزيل عبر ${source.name}` : `Download via ${source.name}`}</span>
-                    </a>
-                  ) : (
-                    <a
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 min-h-[40px] px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>{isAr ? 'فتح صفحة الأرشيف (Cloudflare)' : 'Open Archive Portal'}</span>
-                    </a>
+                      <Layers className="w-3.5 h-3.5" />
+                      <span>{isAr ? 'حزمة XAPK' : 'XAPK'}</span>
+                    </button>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSourceFilter(source.id);
+                      setActiveTab('downloads');
+                    }}
+                    title={isAr ? 'عرض ملفات هذا المصدر' : 'View all files from this source'}
+                    className="min-h-[40px] px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-semibold text-xs flex items-center justify-center border border-slate-700 cursor-pointer active:scale-95"
+                  >
+                    <span>{isAr ? 'الملفات' : 'Files'}</span>
+                  </button>
 
                   <a
                     href={source.url}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Download,
   X,
@@ -39,8 +39,34 @@ export default function DownloadModal({
 
   const filename = `${app.packageId}_v${variant.version}_${variant.architecture}.${variant.format.toLowerCase()}`;
 
+  const triggerActualDownload = useCallback(async () => {
+    try {
+      const res = await fetch(variant.downloadUrl);
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 1500);
+    } catch {
+      // Fallback
+      const link = document.createElement('a');
+      link.href = variant.downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }, [variant.downloadUrl, filename]);
+
   useEffect(() => {
-    // Simulate active download progress for smooth UX, then trigger actual browser download
+    // Smooth progress animation followed by reliable blob download
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -48,35 +74,23 @@ export default function DownloadModal({
           setIsCompleted(true);
           return 100;
         }
-        const step = Math.floor(Math.random() * 20) + 15;
+        const step = Math.floor(Math.random() * 25) + 20;
         const nextVal = Math.min(100, prev + step);
-        const newSpeed = (Math.random() * 6 + 12).toFixed(1) + ' MB/s';
+        const newSpeed = (Math.random() * 6 + 14).toFixed(1) + ' MB/s';
         setDownloadSpeed(newSpeed);
 
         if (nextVal >= 100) {
           clearInterval(timer);
           setIsCompleted(true);
-          // Trigger actual download
-          try {
-            const link = document.createElement('a');
-            link.href = variant.downloadUrl;
-            link.setAttribute('download', filename);
-            link.setAttribute('target', '_blank');
-            link.rel = 'noopener noreferrer';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          } catch {
-            // ignore
-          }
+          triggerActualDownload();
           return 100;
         }
         return nextVal;
       });
-    }, 380);
+    }, 280);
 
     return () => clearInterval(timer);
-  }, [variant.downloadUrl, filename]);
+  }, [triggerActualDownload]);
 
   const copyHash = () => {
     navigator.clipboard.writeText(variant.sha256);
@@ -85,18 +99,9 @@ export default function DownloadModal({
   };
 
   const handleRestartDownload = () => {
-    setProgress(20);
+    setProgress(30);
     setIsCompleted(false);
-    try {
-      const link = document.createElement('a');
-      link.href = variant.downloadUrl;
-      link.setAttribute('download', filename);
-      link.setAttribute('target', '_blank');
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch {}
+    triggerActualDownload();
   };
 
   return (
@@ -209,16 +214,14 @@ export default function DownloadModal({
 
         {/* Action Buttons: Direct link, restart, home */}
         <div className="space-y-2">
-          <a
-            href={variant.downloadUrl}
-            download={filename}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={triggerActualDownload}
             className="w-full min-h-[46px] py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer text-center active:scale-95"
           >
             <Download className="w-4 h-4 stroke-[2.5]" />
-            <span>{isAr ? 'إذا لم يبدأ التنزيل، اضغط هنا مباشرة' : 'Click here to download directly'}</span>
-          </a>
+            <span>{isAr ? 'اضغط هنا للتحميل المباشر الفوري للملف' : 'Click here to download directly now'}</span>
+          </button>
 
           <div className="flex items-center gap-2">
             <button
